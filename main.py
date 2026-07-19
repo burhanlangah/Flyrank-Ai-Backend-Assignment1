@@ -14,6 +14,11 @@ class TaskCreate(BaseModel):
     title: str = ""
 
 
+class TaskUpdate(BaseModel):
+    title: str = ""
+    done: bool = False
+
+
 @app.get("/")
 def read_root():
     return {"name": "Task API", "version": "1.0", "endpoints": ["/tasks"]}
@@ -46,3 +51,26 @@ def create_task(task: TaskCreate):
     new_task = {"id": next_id, "title": task.title, "done": False}
     tasks.append(new_task)
     return new_task
+
+
+@app.put("/tasks/{id}")
+def update_task(id: int, update: TaskUpdate):
+    if not update.title.strip():
+        raise HTTPException(status_code=400, detail="Title is required")
+
+    for task in tasks:
+        if task["id"] == id:
+            task["title"] = update.title
+            task["done"] = update.done
+            return task
+
+    raise HTTPException(status_code=404, detail=f"Task {id} not found")
+
+
+@app.delete("/tasks/{id}", status_code=204)
+def delete_task(id: int):
+    for i, task in enumerate(tasks):
+        if task["id"] == id:
+            tasks.pop(i)
+            return
+    raise HTTPException(status_code=404, detail=f"Task {id} not found")
