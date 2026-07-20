@@ -3,3 +3,4 @@ tempCodeRunnerFile.py
 __pycache__/
 *.pyc
 .env
+__pycache__/
